@@ -28,38 +28,35 @@ import (
 
 func main() {
 	var kubeconfig *string
+	podsCmd := flag.NewFlagSet("pods", flag.ExitOnError)
 	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+		kubeconfig = podsCmd.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
-		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+		kubeconfig = podsCmd.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
 
 	var namespace *string
-	namespace = flag.String("namespace", "default", "Namespace where the pod is located")
+	namespace = podsCmd.String("namespace", "default", "Namespace where the pod is located")
 
 	var allNamespaces *bool
-	allNamespaces = flag.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
+	allNamespaces = podsCmd.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
 
-	flag.Parse()
-
-	if flag.NArg() < 1 {
-		printUsage()
-		os.Exit(1)
-	}
-	subcommand := flag.Arg(0)
+	subcommand := os.Args[1]
 	switch subcommand {
 	case "pods":
-		if flag.NArg() != 2 {
-			fmt.Fprintf(os.Stderr, "ERROR: `pods` expects a pod name\n\n")
+		if len(os.Args) < 2 {
+			// TODO: print helpful error
 			printUsage()
 			os.Exit(1)
 		}
+		podName := os.Args[2]
+		podsCmd.Parse(os.Args[3:])
 		clientset, err := createClient(kubeconfig)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "ERROR: Could not initialize Kubernetes client: %v", err)
 			os.Exit(1)
 		}
-		err = pods(clientset, flag.Arg(1), *namespace, *allNamespaces)
+		err = pods(clientset, podName, *namespace, *allNamespaces)
 	case "nodes":
 		fmt.Println("not implemented")
 		os.Exit(0)
@@ -116,7 +113,7 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Fprintf(os.Stderr, "USAGE\n\n%s [OPTIONS] pods POD\n\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "USAGE\n\n%s pods POD [OPTIONS]\n\n", os.Args[0])
 	flag.PrintDefaults()
 }
 

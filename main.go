@@ -118,8 +118,13 @@ func printUsage() {
 }
 
 func pods(clientset kubernetes.Clientset, pod string, namespace string, allNamespaces bool) error {
-	fmt.Println("namespace: ", namespace)
-	fmt.Println("allNamespaces: ", allNamespaces)
+	var namespaceForList string
+	if allNamespaces {
+		namespaceForList = ""
+	} else {
+		namespaceForList = namespace
+	}
+
 	podDetails, err := clientset.CoreV1().Pods(namespace).Get(pod, metav1.GetOptions{})
 	if err != nil {
 		fmt.Println("ERROR: ", err)
@@ -129,7 +134,8 @@ func pods(clientset kubernetes.Clientset, pod string, namespace string, allNames
 	listOptions := metav1.ListOptions{
 		FieldSelector: fmt.Sprintf("spec.nodeName=%v", podDetails.Spec.NodeName),
 	}
-	podsForNode, err := clientset.CoreV1().Pods(namespace).List(listOptions)
+
+	podsForNode, err := clientset.CoreV1().Pods(namespaceForList).List(listOptions)
 	if err != nil {
 		fmt.Println("ERROR: ", err)
 		os.Exit(1)

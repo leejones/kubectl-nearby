@@ -26,10 +26,15 @@ type podsRunner struct {
 }
 
 func newPodsRunner(args []string) (*podsRunner, error) {
-	podsRunner := podsRunner{}
+	if len(args) < 2 {
+		// TODO: print helpful error
+		printUsage()
+		os.Exit(1)
+	}
+
+	podsCmd := flag.NewFlagSet("pods", flag.ExitOnError)
 
 	var kubeconfig *string
-	podsCmd := flag.NewFlagSet("pods", flag.ExitOnError)
 	if home := homedir.HomeDir(); home != "" {
 		kubeconfig = podsCmd.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
@@ -42,13 +47,9 @@ func newPodsRunner(args []string) (*podsRunner, error) {
 	var allNamespaces *bool
 	allNamespaces = podsCmd.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
 
-	if len(args) < 2 {
-		// TODO: print helpful error
-		printUsage()
-		os.Exit(1)
-	}
-
 	podsCmd.Parse(args[3:])
+
+	podsRunner := podsRunner{}
 	podsRunner.podName = args[2]
 	podsRunner.namespace = *namespace
 	podsRunner.allNamespaces = *allNamespaces

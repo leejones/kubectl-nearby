@@ -13,6 +13,11 @@ import (
 	"k8s.io/client-go/util/homedir"
 )
 
+type podInfo struct {
+	name      string
+	namespace string
+}
+
 type podsRunner struct {
 	clientset     kubernetes.Clientset
 	namespace     string
@@ -62,15 +67,19 @@ func newPodsRunner(args []string) (*podsRunner, error) {
 }
 
 func (podsRunner *podsRunner) execute() error {
-	// TODO move pods to podsRunner
-	err := podsRunner.pods()
+	pods, err := podsRunner.fetchPods()
 	if err != nil {
 		return fmt.Errorf("ERROR: Could not get pods: %v", err)
 	}
+
+	for _, pod := range pods {
+		fmt.Println(pod.name, pod.namespace)
+	}
+
 	return nil
 }
 
-func (podsRunner podsRunner) pods() error {
+func (podsRunner podsRunner) fetchPods() ([]podInfo, error) {
 	var namespaceForList string
 	if podsRunner.allNamespaces {
 		namespaceForList = ""
@@ -87,16 +96,16 @@ func (podsRunner podsRunner) pods() error {
 	listOptions := metav1.ListOptions{
 		FieldSelector: fmt.Sprintf("spec.nodeName=%v", podDetails.Spec.NodeName),
 	}
-
 	podsForNode, err := podsRunner.clientset.CoreV1().Pods(namespaceForList).List(listOptions)
 	if err != nil {
 		fmt.Println("ERROR: ", err)
 		os.Exit(1)
 	}
-	// TODO: Move output to execute and/or a formatting function
+
+	var pods []podInfo
 	for _, pod := range podsForNode.Items {
-		fmt.Println(pod.Name, pod.Namespace)
+		pods = append(pods, podInfo{name: pod.Name, namespace: pod.Namespace})
 	}
 
-	return nil
+	return pods, nil
 }

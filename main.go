@@ -34,7 +34,6 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-
 	case "nodes":
 		fmt.Println("not implemented")
 		os.Exit(0)

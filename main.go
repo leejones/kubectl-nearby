@@ -21,6 +21,12 @@ import (
 // kubectl nearby nodes NODE
 
 func main() {
+	if len(os.Args) == 1 {
+		fmt.Fprintf(os.Stderr, "ERROR: A subcommand is required.\n")
+		printUsage()
+		os.Exit(1)
+	}
+
 	subcommand := os.Args[1]
 	switch subcommand {
 	case "pods":

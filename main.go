@@ -22,15 +22,18 @@ import (
 
 func main() {
 	if len(os.Args) == 1 {
-		fmt.Fprintf(os.Stderr, "ERROR: A subcommand is required.\n")
-		printUsage()
+		fmt.Fprintf(os.Stderr, "ERROR: A command is required.\n")
+		printGeneralUsage()
 		os.Exit(1)
 	}
 
 	subcommand := os.Args[1]
 	switch subcommand {
+	case "nodes":
+		fmt.Println("not implemented")
+		os.Exit(0)
 	case "pods":
-		podsRunner, err := newPodsRunner(os.Args)
+		podsRunner, err := newPodsRunner(os.Args[2:])
 		if err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
@@ -40,20 +43,26 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-	case "nodes":
-		fmt.Println("not implemented")
-		os.Exit(0)
 	default:
 		if subcommand != "" {
-			fmt.Fprintf(os.Stderr, "ERROR: Invalid subcommand: %v\n", subcommand)
+			fmt.Fprintf(os.Stderr, "ERROR: Invalid command: %v\n", subcommand)
 		}
-		printUsage()
 	}
 }
 
-// TODO: move to pods runner
-func printUsage() {
-	fmt.Fprintf(os.Stderr, "USAGE\n\n%s pods POD [OPTIONS]\n\n", os.Args[0])
+func printGeneralUsage() {
+	generalUsage := `kubectl-nearby finds nearby pods or nodes.
+
+Commands:
+  nodes NODE     List nodes in the same availability zone as NODE
+  podes POD      List pods on the same node as POD
+
+Use "kubectl-nearby COMMAND	--help" for more information about a specific command.
+`
+	fmt.Fprintf(os.Stderr, generalUsage)
+	if !flag.Parsed() {
+		flag.Parse()
+	}
 	flag.PrintDefaults()
 }
 

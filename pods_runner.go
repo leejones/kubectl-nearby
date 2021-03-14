@@ -26,12 +26,6 @@ type podsRunner struct {
 }
 
 func newPodsRunner(args []string) (*podsRunner, error) {
-	if len(args) < 2 {
-		// TODO: print helpful error
-		printUsage()
-		os.Exit(1)
-	}
-
 	podsCmd := flag.NewFlagSet("pods", flag.ExitOnError)
 
 	var kubeconfig *string
@@ -47,10 +41,19 @@ func newPodsRunner(args []string) (*podsRunner, error) {
 	var allNamespaces *bool
 	allNamespaces = podsCmd.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
 
-	podsCmd.Parse(args[3:])
+	podsCmd.Usage = func() {
+		fmt.Fprintf(os.Stderr, "List pods on the same node.\n\nUSAGE\n\n  %s pods POD [OPTIONS]\n\nOPTIONS\n\n", os.Args[0])
+		podsCmd.PrintDefaults()
+	}
+	podsCmd.Parse(args)
+
+	if len(podsCmd.Args()) != 1 {
+		fmt.Fprintf(os.Stderr, "ERROR: A single pod name is required, got: %d\n", len(podsCmd.Args()))
+		os.Exit(1)
+	}
 
 	podsRunner := podsRunner{}
-	podsRunner.podName = args[2]
+	podsRunner.podName = args[1]
 	podsRunner.namespace = *namespace
 	podsRunner.allNamespaces = *allNamespaces
 

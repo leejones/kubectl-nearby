@@ -57,7 +57,7 @@ Commands:
   nodes NODE     List nodes in the same availability zone as NODE
   pods POD       List pods on the same node as POD
 
-Use "kubectl-nearby COMMAND	--help" for more information about a specific command.
+Use "kubectl-nearby COMMAND --help" for more information about a specific command.
 `
 	fmt.Fprintf(os.Stderr, generalUsage)
 	if !flag.Parsed() {

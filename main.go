@@ -55,7 +55,7 @@ func printGeneralUsage() {
 
 Commands:
   nodes NODE     List nodes in the same availability zone as NODE
-  podes POD      List pods on the same node as POD
+  pods POD       List pods on the same node as POD
 
 Use "kubectl-nearby COMMAND	--help" for more information about a specific command.
 `

@@ -33,12 +33,12 @@ func main() {
 		fmt.Println("not implemented")
 		os.Exit(0)
 	case "pods":
-		podsRunner, err := newPodsRunner(os.Args[2:])
+		podsCLI, err := newPodsCLI(os.Args[2:])
 		if err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
-		err = podsRunner.execute()
+		err = podsCLI.execute()
 		if err != nil {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
@@ -67,9 +67,9 @@ Use "kubectl-nearby COMMAND	--help" for more information about a specific comman
 }
 
 // TODO: move to separate file
-func createClient(kubeconfig *string) (kubernetes.Clientset, error) {
+func createClientset(kubeconfig string) (kubernetes.Clientset, error) {
 	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", *kubeconfig)
+	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		panic(err.Error())
 	}

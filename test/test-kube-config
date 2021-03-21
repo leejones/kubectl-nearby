@@ -1,0 +1,16 @@
+apiVersion: v1
+clusters:
+- cluster:
+    server: http://127.0.0.1
+  name: testing-cluster
+contexts:
+- context:
+    cluster: testing-cluster
+    namespace: testing-namespace
+    user: test-user
+  name: test-context
+current-context: test-context
+kind: Config
+preferences: {}
+users:
+- name: test-user

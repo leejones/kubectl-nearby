@@ -35,6 +35,11 @@ func main() {
 	case "pods":
 		podsCLI, err := newPodsCLI(os.Args[2:])
 		if err != nil {
+			helpRequestedError := &helpRequestedError{}
+			if err.Error() == helpRequestedError.Error() {
+				podsCLI.printUsage()
+				os.Exit(0)
+			}
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}

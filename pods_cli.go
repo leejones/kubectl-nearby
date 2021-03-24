@@ -3,6 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
+
 	"os"
 	"path/filepath"
 	"regexp"
@@ -16,6 +18,7 @@ import (
 type podsCLI struct {
 	allNamespaces bool
 	clientset     kubernetes.Clientset
+	flags         *flag.FlagSet
 	kubeconfig    string
 	namespace     string
 	podName       string
@@ -58,22 +61,28 @@ func newPodsCLI(args []string) (*podsCLI, error) {
 		}
 	}
 
-	podsFlags := flag.NewFlagSet("kubectl-nearby pods", flag.ContinueOnError)
+	podsCLI.flags = flag.NewFlagSet("kubectl-nearby pods", flag.ContinueOnError)
+
+	podsCLI.flags.Usage = func() {
+		fmt.Fprintf(podsCLI.flags.Output(), "List pods on the same node.\n\nUSAGE\n\n  %s pods POD [OPTIONS]\n\nOPTIONS\n\n", os.Args[0])
+		podsCLI.flags.PrintDefaults()
+	}
+	podsCLI.flags.SetOutput(ioutil.Discard)
 
 	var allNamespaces *bool
-	allNamespaces = podsFlags.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
+	allNamespaces = podsCLI.flags.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
 
 	var kubeconfig *string
 	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = podsFlags.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+		kubeconfig = podsCLI.flags.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
 	} else {
-		kubeconfig = podsFlags.String("kubeconfig", "", "absolute path to the kubeconfig file")
+		kubeconfig = podsCLI.flags.String("kubeconfig", "", "absolute path to the kubeconfig file")
 	}
 
 	var namespace *string
-	namespace = podsFlags.String("namespace", "default", "Namespace where the pod is located")
+	namespace = podsCLI.flags.String("namespace", "default", "Namespace where the pod is located")
 
-	err = podsFlags.Parse(remainingArgs)
+	err = podsCLI.flags.Parse(remainingArgs)
 	if err == flag.ErrHelp {
 		return &podsCLI, &helpRequestedError{}
 	} else if err != nil {
@@ -135,4 +144,14 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 	}
 
 	return pods, nil
+}
+
+// By default, the flag package shows usage on CLI errors. This
+// is a bit noisy and makes the error less obvious. This function
+// allows us to disable usage output by default and enable it only
+// in specific cases (e.g. --help)
+func (podsClI *podsCLI) printUsage() {
+	podsClI.flags.SetOutput(os.Stderr)
+	podsClI.flags.Usage()
+	podsClI.flags.SetOutput(ioutil.Discard)
 }

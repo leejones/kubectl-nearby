@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"path"
 	"path/filepath"
@@ -58,7 +57,6 @@ func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
 	if err != nil {
 		t.Errorf("Could not get working directory: %v", err)
 	}
-	fmt.Println(path.Join(workingDirectory, "test/test-kube-config"))
 	args := []string{
 		"nginx-abc123",
 		"--kubeconfig",

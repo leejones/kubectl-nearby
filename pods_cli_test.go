@@ -121,7 +121,6 @@ func TestNewPodsCLIHelp(t *testing.T) {
 		if want.Error() != got.Error() {
 			t.Errorf("Expected newPodCLI with %v to return a helpRequestedError, but got: %v", args, got)
 		}
-
 	}
 }
 

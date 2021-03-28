@@ -6,13 +6,13 @@ import (
 	"io/ioutil"
 
 	"os"
-	"path/filepath"
 	"regexp"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/tools/clientcmd"
+
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	"k8s.io/client-go/util/homedir"
 )
 
 type podsCLI struct {
@@ -73,14 +73,10 @@ func newPodsCLI(args []string) (*podsCLI, error) {
 	allNamespaces = podsCLI.flags.Bool("all-namespaces", false, "Show colocated pods from all namespaces")
 
 	var kubeconfig *string
-	if home := homedir.HomeDir(); home != "" {
-		kubeconfig = podsCLI.flags.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
-	} else {
-		kubeconfig = podsCLI.flags.String("kubeconfig", "", "absolute path to the kubeconfig file")
-	}
+	kubeconfig = podsCLI.flags.String("kubeconfig", "", fmt.Sprintf("(optional) An absolute path to the kubeconfig file (defaults to the value of KUBECONFIG from the ENV if set or the file %s if present)", clientcmd.RecommendedHomeFile))
 
 	var namespace *string
-	namespace = podsCLI.flags.String("namespace", "default", "Namespace where the pod is located")
+	namespace = podsCLI.flags.String("namespace", "", "Namespace where the pod is located (defaults to namespace set in kubeconfig if set, otherwise 'default'")
 
 	err = podsCLI.flags.Parse(remainingArgs)
 	if err == flag.ErrHelp {
@@ -91,13 +87,44 @@ func newPodsCLI(args []string) (*podsCLI, error) {
 
 	podsCLI.allNamespaces = *allNamespaces
 	podsCLI.kubeconfig = *kubeconfig
-	podsCLI.namespace = *namespace
 
-	clientset, err := createClientset(podsCLI.kubeconfig)
+	// clientcmd example: https://pkg.go.dev/k8s.io/client-go/tools/clientcmd#pkg-overview
+
+	var loadingRules *clientcmd.ClientConfigLoadingRules
+	if podsCLI.kubeconfig == "" {
+		// Look in the standard places
+		loadingRules = clientcmd.NewDefaultClientConfigLoadingRules()
+	} else {
+		// Load from given kubeconfig
+		loadingRules = &clientcmd.ClientConfigLoadingRules{
+			Precedence: []string{podsCLI.kubeconfig},
+		}
+	}
+
+	configOverrides := &clientcmd.ConfigOverrides{}
+	// if you want to change override values or bind them to flags, there are methods to help you
+
+	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
+
+	if err != nil {
+		// Do something
+	}
+
+	if *namespace == "" {
+		podsCLI.namespace, _, err = kubeConfig.Namespace()
+		if err != nil {
+			return &podsCLI, fmt.Errorf("ERROR: Failed to get namespace from kubeconfig: %v", err)
+		}
+	} else {
+		podsCLI.namespace = *namespace
+	}
+
+	config, err := kubeConfig.ClientConfig()
 	if err != nil {
 		return &podsCLI, fmt.Errorf("ERROR: Could not initialize Kubernetes client: %v", err)
 	}
-	podsCLI.clientset = clientset
+	clientset, err := kubernetes.NewForConfig(config)
+	podsCLI.clientset = *clientset
 
 	return &podsCLI, nil
 }

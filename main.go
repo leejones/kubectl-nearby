@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"k8s.io/client-go/kubernetes"
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
-	"k8s.io/client-go/tools/clientcmd"
 )
 
 // USAGE
@@ -69,21 +67,4 @@ Use "kubectl-nearby COMMAND --help" for more information about a specific comman
 		flag.Parse()
 	}
 	flag.PrintDefaults()
-}
-
-// TODO: move to separate file
-func createClientset(kubeconfig string) (kubernetes.Clientset, error) {
-	// use the current context in kubeconfig
-	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	// create the clientset
-	clientset, err := kubernetes.NewForConfig(config)
-	if err != nil {
-		panic(err.Error())
-	}
-
-	return *clientset, nil
 }

@@ -106,10 +106,6 @@ func newPodsCLI(args []string) (*podsCLI, error) {
 
 	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 
-	if err != nil {
-		// Do something
-	}
-
 	if *namespace == "" {
 		podsCLI.namespace, _, err = kubeConfig.Namespace()
 		if err != nil {

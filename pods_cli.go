@@ -200,7 +200,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 			name:                 pod.Name,
 			namespace:            pod.Namespace,
 			restartCount:         restartCount,
-			// TODO: Dig into container status to get things like CrashLoopBackup, Terminating, etc. Otherwise it show "Running" in those states.
+			// TODO: Dig into container status to get things like CrashLoopBackup, Terminating, etc. Otherwise it shows "Running" in those states.
 			status: string(pod.Status.Phase),
 		})
 	}

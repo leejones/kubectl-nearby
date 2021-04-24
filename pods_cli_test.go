@@ -164,11 +164,17 @@ func TestAgeOutput(t *testing.T) {
 	}{
 		{"5s", "5s"},
 		{"119s", "119s"},
-		{"120s", "2m"},
+		// >= 120s then use minutes and seconds
 		{"121s", "2m1s"},
 		{"9m59s", "9m59s"},
+		// >= 10m, use minutes
 		{"10m", "10m"},
-		{"10m1s", "10m"},
+		{"119m59s", "119m"},
+		// >= 120m, use hours
+		{"120m", "2h"},
+		{"23h59m59s", "23h"},
+		// >= 1d, use days
+		{"24h0m1s", "1d"},
 	}
 	for _, testCase := range testCases {
 		input, err := time.ParseDuration(testCase.input)

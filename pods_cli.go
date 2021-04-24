@@ -251,13 +251,13 @@ func columnOutput(input [][]string) (string, error) {
 func ageOutput(duration time.Duration) string {
 	if duration.Seconds() < 120 {
 		return fmt.Sprintf("%vs", duration.Seconds())
-	} else if duration.Seconds() == 120 {
-		return fmt.Sprintf("%vm", duration.Minutes())
 	} else if duration.Seconds() < 600 {
 		return duration.String()
-	} else if duration.Seconds() >= 600 {
-		return fmt.Sprintf("%.0fm", duration.Minutes())
+	} else if duration.Minutes() < 120 {
+		return fmt.Sprintf("%.0fm", duration.Truncate(time.Minute).Minutes())
+	} else if duration.Hours() < 24 {
+		return fmt.Sprintf("%.0fh", duration.Truncate(time.Hour).Hours())
 	} else {
-		return duration.String()
+		return fmt.Sprintf("%.0fd", duration.Truncate(time.Hour).Hours()/24)
 	}
 }

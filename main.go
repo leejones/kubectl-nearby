@@ -28,7 +28,7 @@ func main() {
 	subcommand := os.Args[1]
 	switch subcommand {
 	case "nodes":
-		fmt.Println("not implemented")
+		fmt.Println("ERROR: Sorry, not implemented yet.")
 		os.Exit(0)
 	case "pods":
 		podsCLI, err := newPodsCLI(os.Args[2:])

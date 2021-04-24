@@ -131,10 +131,11 @@ func (podsCLI *podsCLI) execute() error {
 		return fmt.Errorf("ERROR: Could not get pods: %v", err)
 	}
 
+	fmt.Printf("NAMESPACE\tNAME\n")
 	for _, pod := range pods {
 		// TODO: Match kubectl get pods output (e.g. status, containers, age)
 		// TODO: Space columns
-		fmt.Println(pod.namespace, pod.name)
+		fmt.Printf("%v\t%v\n", pod.namespace, pod.name)
 	}
 
 	return nil

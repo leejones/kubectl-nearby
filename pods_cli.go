@@ -171,6 +171,9 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 		os.Exit(1)
 	}
 
+	// TODO: Should something special happen for unscheduled pods (e.g. status: Pending)?
+	// If a pending pod is given, it has no node (it's unscheduled). The search will return
+	// all other pods in the same state.
 	listOptions := metav1.ListOptions{
 		FieldSelector: fmt.Sprintf("spec.nodeName=%v", podDetails.Spec.NodeName),
 	}
@@ -200,7 +203,8 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 			name:                 pod.Name,
 			namespace:            pod.Namespace,
 			restartCount:         restartCount,
-			// TODO: Dig into container status to get things like CrashLoopBackup, Terminating, etc. Otherwise it shows "Running" in those states.
+			// TODO: Dig into container status to get things like CrashLoopBackup,
+			// Terminating, etc. Otherwise it shows "Running" in those states.
 			status: string(pod.Status.Phase),
 		})
 	}

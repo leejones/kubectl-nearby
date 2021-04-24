@@ -94,6 +94,7 @@ func newPodsCLI(args []string) (*podsCLI, error) {
 	podsCLI.allNamespaces = *allNamespaces
 	podsCLI.kubeconfig = *kubeconfig
 
+	// TODO: extract kubeconfig and clientset logic to separate function(s)
 	// clientcmd example: https://pkg.go.dev/k8s.io/client-go/tools/clientcmd#pkg-overview
 
 	var loadingRules *clientcmd.ClientConfigLoadingRules

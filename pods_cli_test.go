@@ -135,7 +135,6 @@ func TestNewPodsCLIInvalidFlag(t *testing.T) {
 
 // TODO test podsCLI.clientset?
 
-// columnOutput([][]string) (string, error)
 func TestColumnOuput(t *testing.T) {
 	want := strings.Trim(`
 NAMESPACE   NAME               READY

@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"time"
 
 	"os"
 	"regexp"
@@ -25,8 +26,13 @@ type podsCLI struct {
 }
 
 type podInfo struct {
-	name      string
-	namespace string
+	age                  string
+	containersCount      int
+	containersReadyCount int
+	name                 string
+	namespace            string
+	restartCount         int32
+	status               string
 }
 
 type noArgsError struct{}
@@ -131,11 +137,12 @@ func (podsCLI *podsCLI) execute() error {
 		return fmt.Errorf("ERROR: Could not get pods: %v", err)
 	}
 
-	fmt.Printf("NAMESPACE\tNAME\n")
+	fmt.Printf("NAMESPACE\tNAME\tREADY\tSTATUS\tRESTARTS\tAGE\n")
 	for _, pod := range pods {
 		// TODO: Match kubectl get pods output (e.g. status, containers, age)
 		// TODO: Space columns
-		fmt.Printf("%v\t%v\n", pod.namespace, pod.name)
+		containersReady := fmt.Sprintf("%v/%v", pod.containersReadyCount, pod.containersCount)
+		fmt.Printf("%v\t%v\t%v\t%v\t%v\t%v\n", pod.namespace, pod.name, containersReady, pod.status, pod.restartCount, pod.age)
 	}
 
 	return nil
@@ -166,7 +173,27 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 
 	var pods []podInfo
 	for _, pod := range podsForNode.Items {
-		pods = append(pods, podInfo{name: pod.Name, namespace: pod.Namespace})
+		containersReadyCount := 0
+		var restartCount int32 = 0
+		for _, status := range pod.Status.ContainerStatuses {
+			if status.Ready {
+				containersReadyCount += 1
+			}
+			restartCount += status.RestartCount
+		}
+		// TODO: Show only necessary units (e.g. 25s or or 3h5m, or 3d5h), but add tests first
+		age := time.Since(pod.CreationTimestamp.Time).Round(time.Second).String()
+
+		pods = append(pods, podInfo{
+			age:                  age,
+			containersCount:      len(pod.Status.ContainerStatuses),
+			containersReadyCount: containersReadyCount,
+			name:                 pod.Name,
+			namespace:            pod.Namespace,
+			restartCount:         restartCount,
+			// TODO: Dig into container status to get things like CrashLoopBackup, Terminating, etc. Otherwise it show "Running" in those states.
+			status: string(pod.Status.Phase),
+		})
 	}
 
 	return pods, nil

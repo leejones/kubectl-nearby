@@ -132,7 +132,9 @@ func (podsCLI *podsCLI) execute() error {
 	}
 
 	for _, pod := range pods {
-		fmt.Println(pod.name, pod.namespace)
+		// TODO: Match kubectl get pods output (e.g. status, containers, age)
+		// TODO: Space columns
+		fmt.Println(pod.namespace, pod.name)
 	}
 
 	return nil

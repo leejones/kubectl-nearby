@@ -3,10 +3,8 @@ package main
 import (
 	"os"
 	"path"
-	"path/filepath"
+	"strings"
 	"testing"
-
-	"k8s.io/client-go/util/homedir"
 )
 
 func TestNewPodsCLINoArgs(t *testing.T) {
@@ -32,11 +30,10 @@ func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
 		t.Errorf("podsCLI.podName should return %v, got: %v", wantPodName, gotpodName)
 	}
 
-	home := homedir.HomeDir()
-	wantKubeconfig := filepath.Join(home, ".kube", "config")
+	wantKubeconfig := ""
 	gotKubeconfig := podsCLI.kubeconfig
 	if wantKubeconfig != gotKubeconfig {
-		t.Errorf("kubeconfig should default to: %v, got: %v", wantKubeconfig, gotKubeconfig)
+		t.Errorf("kubeconfig should default to: %v (an empty string), got: %v", wantKubeconfig, gotKubeconfig)
 	}
 
 	wantNamespace := "default"
@@ -137,3 +134,24 @@ func TestNewPodsCLIInvalidFlag(t *testing.T) {
 }
 
 // TODO test podsCLI.clientset?
+
+// columnOutput([][]string) (string, error)
+func TestColumnOuput(t *testing.T) {
+	want := strings.Trim(`
+NAMESPACE   NAME               READY
+default     foo-bar-abc123     1/3  
+production  baz-bat-db-def456  2/2  
+`, "\n")
+	input := [][]string{
+		{"NAMESPACE", "NAME", "READY"},
+		{"default", "foo-bar-abc123", "1/3"},
+		{"production", "baz-bat-db-def456", "2/2"},
+	}
+	got, err := columnOutput(input)
+	if err != nil {
+		t.Errorf("Unexpected error: %v", err)
+	}
+	if want != got {
+		t.Errorf("Expected columnOutput to return:\n%v\n--- but got: ---\n%v", want, got)
+	}
+}

@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"strconv"
+	"strings"
 	"time"
 
 	"os"
@@ -138,14 +140,20 @@ func (podsCLI *podsCLI) execute() error {
 		return fmt.Errorf("ERROR: Could not get pods: %v", err)
 	}
 
-	fmt.Printf("NAMESPACE\tNAME\tREADY\tSTATUS\tRESTARTS\tAGE\n")
-	for _, pod := range pods {
-		// TODO: Match kubectl get pods output (e.g. status, containers, age)
-		// TODO: Space columns
-		containersReady := fmt.Sprintf("%v/%v", pod.containersReadyCount, pod.containersCount)
-		fmt.Printf("%v\t%v\t%v\t%v\t%v\t%v\n", pod.namespace, pod.name, containersReady, pod.status, pod.restartCount, pod.age)
+	podsOutput := [][]string{
+		{"NAMESPACE", "NAME", "READY", "STATUS", "RESTARTS", "AGE"},
 	}
-
+	for _, pod := range pods {
+		containersReady := fmt.Sprintf("%v/%v", pod.containersReadyCount, pod.containersCount)
+		podsOutput = append(podsOutput, []string{
+			pod.namespace, pod.name, containersReady, pod.status, strconv.FormatInt(int64(pod.restartCount), 10), pod.age,
+		})
+	}
+	formattedOutput, err := columnOutput(podsOutput)
+	if err != nil {
+		return fmt.Errorf("ERROR: There was an error formatting the output: %v", err)
+	}
+	fmt.Println(formattedOutput)
 	return nil
 }
 
@@ -208,4 +216,34 @@ func (podsClI *podsCLI) printUsage() {
 	podsClI.flags.SetOutput(os.Stderr)
 	podsClI.flags.Usage()
 	podsClI.flags.SetOutput(ioutil.Discard)
+}
+
+func columnOutput(input [][]string) (string, error) {
+	columnLengths := []int{}
+	columnCount := len(input[0])
+	for i := 0; i < columnCount; i++ {
+		columnLengths = append(columnLengths, 0)
+	}
+	output := []string{}
+	for _, row := range input {
+		for index, item := range row {
+			currentColumnLength := columnLengths[index]
+			if currentColumnLength < len(item) {
+				columnLengths[index] = len(item)
+			}
+		}
+	}
+	for _, row := range input {
+		outputRow := []string{}
+		for index, item := range row {
+			columnLength := columnLengths[index]
+			outputItem := item
+			for len(outputItem) < columnLength {
+				outputItem += " "
+			}
+			outputRow = append(outputRow, outputItem)
+		}
+		output = append(output, strings.Join(outputRow, "  "))
+	}
+	return strings.Join(output, "\n"), nil
 }

@@ -5,6 +5,7 @@ import (
 	"path"
 	"strings"
 	"testing"
+	"time"
 )
 
 func TestNewPodsCLINoArgs(t *testing.T) {
@@ -152,5 +153,32 @@ production  baz-bat-db-def456  2/2
 	}
 	if want != got {
 		t.Errorf("Expected columnOutput to return:\n%v\n--- but got: ---\n%v", want, got)
+	}
+}
+
+// ageOutput(d time.Duration) string
+func TestAgeOutput(t *testing.T) {
+	var testCases = []struct {
+		input  string
+		output string
+	}{
+		{"5s", "5s"},
+		{"119s", "119s"},
+		{"120s", "2m"},
+		{"121s", "2m1s"},
+		{"9m59s", "9m59s"},
+		{"10m", "10m"},
+		{"10m1s", "10m"},
+	}
+	for _, testCase := range testCases {
+		input, err := time.ParseDuration(testCase.input)
+		if err != nil {
+			t.Errorf("Unexpected error parsing testCase intput: %v, error: %v", testCase.input, err)
+		}
+		want := testCase.output
+		got := ageOutput(input)
+		if want != got {
+			t.Errorf("Expected ageOutput(%v) to return: %v, but got: %v", input, want, got)
+		}
 	}
 }

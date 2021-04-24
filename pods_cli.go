@@ -190,8 +190,8 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 			}
 			restartCount += status.RestartCount
 		}
-		// TODO: Show only necessary units (e.g. 25s or or 3h5m, or 3d5h), but add tests first
-		age := time.Since(pod.CreationTimestamp.Time).Round(time.Second).String()
+
+		age := ageOutput(time.Since(pod.CreationTimestamp.Time))
 
 		pods = append(pods, podInfo{
 			age:                  age,
@@ -246,4 +246,18 @@ func columnOutput(input [][]string) (string, error) {
 		output = append(output, strings.Join(outputRow, "  "))
 	}
 	return strings.Join(output, "\n"), nil
+}
+
+func ageOutput(duration time.Duration) string {
+	if duration.Seconds() < 120 {
+		return fmt.Sprintf("%vs", duration.Seconds())
+	} else if duration.Seconds() == 120 {
+		return fmt.Sprintf("%vm", duration.Minutes())
+	} else if duration.Seconds() < 600 {
+		return duration.String()
+	} else if duration.Seconds() >= 600 {
+		return fmt.Sprintf("%.0fm", duration.Minutes())
+	} else {
+		return duration.String()
+	}
 }

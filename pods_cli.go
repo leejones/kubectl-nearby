@@ -111,8 +111,6 @@ func newPodsCLI(args []string) (*podsCLI, error) {
 	}
 
 	configOverrides := &clientcmd.ConfigOverrides{}
-	// if you want to change override values or bind them to flags, there are methods to help you
-
 	kubeConfig := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(loadingRules, configOverrides)
 
 	if *namespace == "" {

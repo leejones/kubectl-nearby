@@ -15,8 +15,6 @@ import (
 // OPTIONS
 // 	--namespace
 //  --all-namespaces
-//
-// kubectl nearby nodes NODE
 
 func main() {
 	if len(os.Args) == 1 {
@@ -27,9 +25,6 @@ func main() {
 
 	subcommand := os.Args[1]
 	switch subcommand {
-	case "nodes":
-		fmt.Println("ERROR: Sorry, not implemented yet.")
-		os.Exit(0)
 	case "pods":
 		podsCLI, err := newPodsCLI(os.Args[2:])
 		if err != nil {
@@ -57,7 +52,6 @@ func printGeneralUsage() {
 	generalUsage := `kubectl-nearby finds nearby pods or nodes.
 
 Commands:
-  nodes NODE     List nodes in the same availability zone as NODE
   pods POD       List pods on the same node as POD
 
 Use "kubectl-nearby COMMAND --help" for more information about a specific command.

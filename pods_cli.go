@@ -11,6 +11,7 @@ import (
 	"os"
 	"regexp"
 
+	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
@@ -194,19 +195,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 
 		age := ageOutput(time.Since(pod.CreationTimestamp.Time))
 
-		statusValue := string(pod.Status.Phase)
-		if statusValue != "Pending" {
-			for _, status := range pod.Status.ContainerStatuses {
-				if status.State.Waiting != nil {
-					statusValue = status.State.Waiting.Reason
-					break
-				} else if status.State.Running != nil {
-					statusValue = "Running"
-				} else if status.State.Terminated != nil {
-					statusValue = status.State.Terminated.Reason
-				}
-			}
-		}
+		status := podStatusOutput(pod.Status)
 
 		pods = append(pods, podInfo{
 			age:                  age,
@@ -215,7 +204,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 			name:                 pod.Name,
 			namespace:            pod.Namespace,
 			restartCount:         restartCount,
-			status:               statusValue,
+			status:               status,
 		})
 	}
 
@@ -274,4 +263,20 @@ func ageOutput(duration time.Duration) string {
 	} else {
 		return fmt.Sprintf("%.0fd", duration.Truncate(time.Hour).Hours()/24)
 	}
+}
+
+func podStatusOutput(podStatus v1.PodStatus) string {
+	output := string(podStatus.Phase)
+	if output != "Pending" {
+		for _, status := range podStatus.ContainerStatuses {
+			if status.State.Waiting != nil {
+				return status.State.Waiting.Reason
+			} else if status.State.Running != nil {
+				output = "Running"
+			} else if status.State.Terminated != nil {
+				return status.State.Terminated.Reason
+			}
+		}
+	}
+	return output
 }

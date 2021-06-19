@@ -194,6 +194,20 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 
 		age := ageOutput(time.Since(pod.CreationTimestamp.Time))
 
+		statusValue := string(pod.Status.Phase)
+		if statusValue != "Pending" {
+			for _, status := range pod.Status.ContainerStatuses {
+				if status.State.Waiting != nil {
+					statusValue = status.State.Waiting.Reason
+					break
+				} else if status.State.Running != nil {
+					statusValue = "Running"
+				} else if status.State.Terminated != nil {
+					statusValue = status.State.Terminated.Reason
+				}
+			}
+		}
+
 		pods = append(pods, podInfo{
 			age:                  age,
 			containersCount:      len(pod.Status.ContainerStatuses),
@@ -201,9 +215,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 			name:                 pod.Name,
 			namespace:            pod.Namespace,
 			restartCount:         restartCount,
-			// TODO: Dig into container status to get things like CrashLoopBackup,
-			// Terminating, etc. Otherwise it shows "Running" in those states.
-			status: string(pod.Status.Phase),
+			status:               statusValue,
 		})
 	}
 

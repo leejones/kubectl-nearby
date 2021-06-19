@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"regexp"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
@@ -42,10 +43,22 @@ func main() {
 			os.Exit(1)
 		}
 	default:
-		if subcommand != "" {
-			fmt.Fprintf(os.Stderr, "ERROR: Invalid command: %v\n", subcommand)
+		if subcommand == "" || helpRequested(os.Args) {
+			printGeneralUsage()
+		} else {
+			fmt.Fprintf(os.Stderr, "ERROR: Invalid command or options: %v\n", os.Args)
 		}
 	}
+}
+
+func helpRequested(args [](string)) bool {
+	helpMatcher := regexp.MustCompile(`(--help|-h)`)
+	for _, arg := range args {
+		if helpMatcher.Match([]byte(arg)) {
+			return true
+		}
+	}
+	return false
 }
 
 func printGeneralUsage() {

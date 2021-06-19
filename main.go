@@ -69,7 +69,7 @@ Commands:
 
 Use "kubectl-nearby COMMAND --help" for more information about a specific command.
 `
-	fmt.Fprintf(os.Stderr, generalUsage)
+	fmt.Fprint(os.Stderr, generalUsage)
 	if !flag.Parsed() {
 		flag.Parse()
 	}

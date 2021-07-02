@@ -4,7 +4,7 @@ A kubectl plugin that lists pods on the same node as the given pod.
 
 ## Installation
 
-1. Download the latest version from the [releases](/releases) page.
+1. Download the latest version from the [Releases](https://github.com/leejones/kubectl-nearby/releases) page.
 2. Place the `kubectl-nearby` binary in a directory that's included in your `$PATH`. For example: `/usr/local/bin`.
 
 ## Usage

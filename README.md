@@ -26,11 +26,11 @@ Options:
 
 This is the standard release process for maintainers.
 
-1. Go to the [Releases](/releases) page
+1. Go to the [Releases](/kubectl-nearby/releases) page
 1. Note the most recent release version
 1. Locally, checkout the `main` branch to the latest revision
 1. Run `bin/release VERSION` where version is in the form `vX.Y.Z` and is the next logical semantic version based on the changes
-1. Go to the [Tags](/tags) page
+1. Go to the [Tags](/kubectl-nearby/tags) page
 1. Find the tag named after the version you just created
 1. Click **...** and click **Create release**
     1. Release title format: `Release vX.Y.Z`

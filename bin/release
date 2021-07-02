@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+release_branch="main"
+binary_name="kubectl-nearby"
+
+version_regex="^v[0-9]+\.[0-9]+\.[0-9]+"
+if [[ "${1:-}" == "" ]]; then
+  echo "ERROR: A version is required."
+  exit 1
+elif [[ ! "${1:-}" =~  $version_regex ]]; then
+  echo "ERROR: Version should be in the format: vX.X.X (e.g. v0.1.1)."
+  exit 1
+fi
+
+version="${1}"
+
+# Check that current branch is correct
+current_branch="$(git branch | grep -E "^\*" | awk '{print $2}')"
+if [[ "${current_branch}" != "${release_branch}" ]]; then
+  echo "ERROR: Cannot build release from branch: ${current_branch}. Checkout the ${release_branch} branch before building a release."
+  exit 1
+fi
+
+# Check that current branch is clean
+pending_changes="$(git status --short)"
+if [[ "${pending_changes}" != "" ]]; then
+  echo "ERROR: Pending changes detected. Commit changes before building a release."
+  exit 1
+fi
+
+# Check that current branch is up-to-date
+git fetch origin --quiet
+diff_with_origin="$(git diff "origin/${release_branch}")"
+if [[ "${diff_with_origin}" != "" ]]; then
+  echo "ERROR: Local branch: ${release_branch} differs from origin. Update the local or origin before creating a release."
+  exit 1
+fi
+
+echo "== Tagging release at ${version}"
+git tag "${version}"
+
+echo "== Building release for ${version}"
+base_directory="releases/${version}"
+rm -rf "${base_directory}"
+for target in darwin/amd64 linux/amd64; do
+  os="$(echo "${target}" | cut -d / -f 1)"
+  platform="$(echo "${target}" | cut -d / -f 2)"
+  release_directory="${base_directory}/targets/${os}/${platform}"
+  mkdir -p "${release_directory}"
+  binary_file_path="${release_directory}/${binary_name}"
+  GOOS="${os}" GOARCH="${platform}" go build -o "${binary_file_path}" $(git ls-files -- '*.go' ':!:*_test.go')
+  echo "== Created ${binary_file_path}"
+  compressed_filename="${binary_name}-${version}-${os}-${platform}.tar.gz"
+  # COPYFILE_DISABLE prevents a MacOS metadata file from being included in the tar
+  COPYFILE_DISABLE=1 tar -czf "${release_directory}/${compressed_filename}" -C "${release_directory}" "${binary_name}"
+  echo "== Created ${release_directory}/${compressed_filename}"
+done
+
+echo "=== Pushing tag ${version}"
+git push --quiet origin "refs/tags/${version}"

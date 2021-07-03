@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"runtime"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
@@ -16,6 +17,11 @@ import (
 // OPTIONS
 //  --namespace
 //  --all-namespaces
+
+var buildDate = "unset"
+var gitCommit = "unset"
+var gitTreeState = "unset"
+var version = "unset"
 
 func main() {
 	if len(os.Args) == 1 {
@@ -42,6 +48,9 @@ func main() {
 			fmt.Printf("ERROR: %v\n", err)
 			os.Exit(1)
 		}
+	case "--version", "--v":
+		printVersion()
+		os.Exit(0)
 	default:
 		if subcommand == "" || helpRequested(os.Args) {
 			printGeneralUsage()
@@ -74,4 +83,12 @@ Use "kubectl-nearby COMMAND --help" for more information about a specific comman
 		flag.Parse()
 	}
 	flag.PrintDefaults()
+}
+
+func printVersion() {
+	fmt.Println("Version:", version)
+	fmt.Println("BuildDate:", buildDate)
+	fmt.Println("GitCommit:", gitCommit)
+	fmt.Println("GitTreeState:", gitTreeState)
+	fmt.Println("GoVersion:", runtime.Version())
 }

@@ -5,6 +5,8 @@ set -o errtrace
 set -o nounset
 set -o pipefail
 
+source "bin/lib/build-utils.sh"
+
 release_branch="main"
 binary_name="kubectl-nearby"
 
@@ -53,7 +55,7 @@ for target in darwin/amd64 linux/amd64; do
   release_directory="${base_directory}/targets/${os}/${platform}"
   mkdir -p "${release_directory}"
   binary_file_path="${release_directory}/${binary_name}"
-  GOOS="${os}" GOARCH="${platform}" go build -o "${binary_file_path}" $(git ls-files -- '*.go' ':!:*_test.go')
+  GOOS="${os}" GOARCH="${platform}" go build -o "${binary_file_path}" "$(_ldflags "${version}")" $(git ls-files -- '*.go' ':!:*_test.go')
   echo "== Created ${binary_file_path}"
   compressed_filename="${binary_name}-${version}-${os}-${platform}.tar.gz"
   # COPYFILE_DISABLE prevents a MacOS metadata file from being included in the tar

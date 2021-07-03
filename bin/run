@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -o errexit
+set -o errtrace
+set -o nounset
+set -o pipefail
+
+# Builds and runs kubectl-nearby with the given args (if any)
+
+source "bin/lib/build-utils.sh"
+
+go run \
+  "$(_ldflags)" \
+  $(git ls-files -- '*.go' ':!:*_test.go') \
+  "${@}"

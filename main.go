@@ -14,7 +14,7 @@ import (
 // kubectl nearby pods POD [OPTIONS]
 //
 // OPTIONS
-// 	--namespace
+//  --namespace
 //  --all-namespaces
 
 func main() {

@@ -74,9 +74,13 @@ func printGeneralUsage() {
 	generalUsage := `kubectl-nearby finds nearby pods or nodes.
 
 Commands:
-  pods POD       List pods on the same node as POD
+  pods POD       List pods on the same node as POD.
 
 Use "kubectl-nearby COMMAND --help" for more information about a specific command.
+
+Global options:
+
+  --version, -v  Display the version and build information.
 `
 	fmt.Fprint(os.Stderr, generalUsage)
 	if !flag.Parsed() {

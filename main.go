@@ -7,6 +7,8 @@ import (
 	"regexp"
 	"runtime"
 
+	"github.com/leejones/kubectl-nearby/pkg/nodes"
+
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
@@ -32,6 +34,13 @@ func main() {
 
 	subcommand := os.Args[1]
 	switch subcommand {
+	case "nodes", "node":
+		nodesCLI := nodes.NodesCLI{}
+		err := nodesCLI.Execute(os.Args[2:], os.Stdout)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			os.Exit(1)
+		}
 	case "pods":
 		podsCLI, err := newPodsCLI(os.Args[2:])
 		if err != nil {
@@ -74,6 +83,7 @@ func printGeneralUsage() {
 	generalUsage := `kubectl-nearby finds nearby pods or nodes.
 
 Commands:
+  nodes NODE     List nodes in the same zone as NODE.
   pods POD       List pods on the same node as POD.
 
 Use "kubectl-nearby COMMAND --help" for more information about a specific command.

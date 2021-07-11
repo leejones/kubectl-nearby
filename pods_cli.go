@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"io/ioutil"
 	"strconv"
-	"strings"
 	"time"
 
 	"os"
 	"regexp"
+
+	"github.com/leejones/kubectl-nearby/pkg/output"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -148,7 +149,7 @@ func (podsCLI *podsCLI) execute() error {
 			pod.namespace, pod.name, containersReady, pod.status, strconv.FormatInt(int64(pod.restartCount), 10), pod.age,
 		})
 	}
-	formattedOutput, err := columnOutput(podsOutput)
+	formattedOutput, err := output.Columns(podsOutput)
 	if err != nil {
 		return fmt.Errorf("ERROR: There was an error formatting the output: %v", err)
 	}
@@ -193,7 +194,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 			restartCount += status.RestartCount
 		}
 
-		age := ageOutput(time.Since(pod.CreationTimestamp.Time))
+		age := output.Age(time.Since(pod.CreationTimestamp.Time))
 
 		status := podStatusOutput(pod.Status)
 
@@ -219,50 +220,6 @@ func (podsClI *podsCLI) printUsage() {
 	podsClI.flags.SetOutput(os.Stderr)
 	podsClI.flags.Usage()
 	podsClI.flags.SetOutput(ioutil.Discard)
-}
-
-func columnOutput(input [][]string) (string, error) {
-	columnLengths := []int{}
-	columnCount := len(input[0])
-	for i := 0; i < columnCount; i++ {
-		columnLengths = append(columnLengths, 0)
-	}
-	output := []string{}
-	for _, row := range input {
-		for index, item := range row {
-			currentColumnLength := columnLengths[index]
-			if currentColumnLength < len(item) {
-				columnLengths[index] = len(item)
-			}
-		}
-	}
-	for _, row := range input {
-		outputRow := []string{}
-		for index, item := range row {
-			columnLength := columnLengths[index]
-			outputItem := item
-			for len(outputItem) < columnLength {
-				outputItem += " "
-			}
-			outputRow = append(outputRow, outputItem)
-		}
-		output = append(output, strings.Join(outputRow, "  "))
-	}
-	return strings.Join(output, "\n"), nil
-}
-
-func ageOutput(duration time.Duration) string {
-	if duration.Seconds() < 120 {
-		return fmt.Sprintf("%vs", duration.Seconds())
-	} else if duration.Seconds() < 600 {
-		return duration.String()
-	} else if duration.Minutes() < 120 {
-		return fmt.Sprintf("%.0fm", duration.Truncate(time.Minute).Minutes())
-	} else if duration.Hours() < 24 {
-		return fmt.Sprintf("%.0fh", duration.Truncate(time.Hour).Hours())
-	} else {
-		return fmt.Sprintf("%.0fd", duration.Truncate(time.Hour).Hours()/24)
-	}
 }
 
 func podStatusOutput(podStatus v1.PodStatus) string {

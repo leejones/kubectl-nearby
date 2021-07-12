@@ -19,6 +19,15 @@ func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
 	args := []string{
 		"nginx-abc123",
 	}
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		t.Errorf("working directory: %v", err)
+	}
+	// The user's default kubeconfig (e.g. $HOME/.kube/config) may have a namespace set. This
+	// makes the namespace test less reliable. Setting the KUBECONFIG ENV var is a close approximation
+	// to the user's default kubeconfig and allows us to have predictable results.
+	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
+	defer os.Unsetenv("KUBECONFIG")
 	podsCLI, err := newPodsCLI(args)
 	if err != nil {
 		t.Errorf("Error creating new podsCLI: %v", err)
@@ -35,7 +44,7 @@ func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
 		t.Errorf("kubeconfig should default to: %v (an empty string), got: %v", wantKubeconfig, gotKubeconfig)
 	}
 
-	wantNamespace := "default"
+	wantNamespace := "testing-cluster-default"
 	gotNamespace := podsCLI.namespace
 	if wantNamespace != gotNamespace {
 		t.Errorf("namespace should default to: %v, got: %v", wantNamespace, gotNamespace)

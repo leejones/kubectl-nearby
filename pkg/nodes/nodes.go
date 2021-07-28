@@ -48,7 +48,6 @@ func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 				remainingArgs = []string{}
 			}
 		}
-
 	}
 
 	f := flag.NewFlagSet("kubectl nearby nodes", flag.ContinueOnError)

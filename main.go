@@ -26,14 +26,14 @@ func main() {
 
 	subcommand := os.Args[1]
 	switch subcommand {
-	case "nodes", "node":
+	case "nodes", "node", "no":
 		nodesCLI := nodes.NodesCLI{}
 		err := nodesCLI.Execute(os.Args[2:], os.Stdout)
 		if err != nil {
 			fmt.Printf("ERROR: %s\n", err)
 			os.Exit(1)
 		}
-	case "pods":
+	case "pods", "pod", "po":
 		podsCLI, err := newPodsCLI(os.Args[2:])
 		if err != nil {
 			helpRequestedError := &helpRequestedError{}

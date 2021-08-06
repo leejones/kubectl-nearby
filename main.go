@@ -12,14 +12,6 @@ import (
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
 
-// USAGE
-//
-// kubectl nearby pods POD [OPTIONS]
-//
-// OPTIONS
-//  --namespace
-//  --all-namespaces
-
 var buildDate = "unset"
 var gitCommit = "unset"
 var gitTreeState = "unset"

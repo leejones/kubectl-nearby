@@ -6,6 +6,7 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"strings"
 
 	"github.com/leejones/kubectl-nearby/pkg/nodes"
 
@@ -56,7 +57,7 @@ func main() {
 		if subcommand == "" || helpRequested(os.Args) {
 			printGeneralUsage()
 		} else {
-			fmt.Fprintf(os.Stderr, "ERROR: Invalid command or options: %v\n", os.Args)
+			fmt.Fprintf(os.Stderr, "ERROR: Invalid command or options: %v\n", strings.Join(os.Args[1:], " "))
 		}
 	}
 }

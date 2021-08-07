@@ -9,11 +9,6 @@ set -o pipefail
 
 source "bin/lib/build-utils.sh"
 
-function _go_files() {
-  find . -type f -name '*.go' -depth 1 -not -name '*_test.go' \
-    | tr '\r\n' ' '
-}
-
 go run \
   "$(_ldflags)" \
   $(_go_files) \

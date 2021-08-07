@@ -6,17 +6,12 @@ import (
 	"os"
 	"regexp"
 	"runtime"
+	"strings"
+
+	"github.com/leejones/kubectl-nearby/pkg/nodes"
 
 	_ "k8s.io/client-go/plugin/pkg/client/auth/gcp"
 )
-
-// USAGE
-//
-// kubectl nearby pods POD [OPTIONS]
-//
-// OPTIONS
-//  --namespace
-//  --all-namespaces
 
 var buildDate = "unset"
 var gitCommit = "unset"
@@ -32,7 +27,14 @@ func main() {
 
 	subcommand := os.Args[1]
 	switch subcommand {
-	case "pods":
+	case "nodes", "node", "no":
+		nodesCLI := nodes.NodesCLI{}
+		err := nodesCLI.Execute(os.Args[2:], os.Stdout)
+		if err != nil {
+			fmt.Printf("ERROR: %s\n", err)
+			os.Exit(1)
+		}
+	case "pods", "pod", "po":
 		podsCLI, err := newPodsCLI(os.Args[2:])
 		if err != nil {
 			helpRequestedError := &helpRequestedError{}
@@ -55,7 +57,7 @@ func main() {
 		if subcommand == "" || helpRequested(os.Args) {
 			printGeneralUsage()
 		} else {
-			fmt.Fprintf(os.Stderr, "ERROR: Invalid command or options: %v\n", os.Args)
+			fmt.Fprintf(os.Stderr, "ERROR: Invalid command or options: %v\n", strings.Join(os.Args[1:], " "))
 		}
 	}
 }
@@ -74,6 +76,7 @@ func printGeneralUsage() {
 	generalUsage := `kubectl-nearby finds nearby pods or nodes.
 
 Commands:
+  nodes NODE     List nodes in the same zone as NODE.
   pods POD       List pods on the same node as POD.
 
 Use "kubectl-nearby COMMAND --help" for more information about a specific command.

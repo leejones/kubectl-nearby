@@ -100,7 +100,7 @@ func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 
 	for _, node := range nearbyNodes.Items {
 		roles := []string{}
-		for key, _ := range node.Labels {
+		for key := range node.Labels {
 			if strings.HasPrefix(key, "node-role.kubernetes.io/") {
 				roleParts := strings.Split(key, "/")
 				if len(roleParts) == 2 {

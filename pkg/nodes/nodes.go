@@ -64,7 +64,7 @@ func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 
 	err := f.Parse(remainingArgs)
 	if err == flag.ErrHelp {
-		Usage(f, writer)
+		usage(f, writer)
 		return nil
 	} else if err != nil {
 		return fmt.Errorf("error parsing CLI arguments: %v", err)
@@ -147,7 +147,7 @@ func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 	return nil
 }
 
-func Usage(flags *flag.FlagSet, writer io.Writer) {
+func usage(flags *flag.FlagSet, writer io.Writer) {
 	flags.SetOutput(writer)
 	flags.Usage()
 	flags.SetOutput(ioutil.Discard)

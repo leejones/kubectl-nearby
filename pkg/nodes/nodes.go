@@ -1,4 +1,4 @@
-// TODO: describe package
+// Package nodes provides a CLI to list nearby nodes.
 package nodes
 
 import (
@@ -19,6 +19,8 @@ import (
 	"github.com/leejones/kubectl-nearby/pkg/output"
 )
 
+// A NodesCLI is used to create a command line interface for listing nearby
+// nodes.
 type NodesCLI struct {
 	Client kubernetes.Interface
 }
@@ -29,7 +31,8 @@ func (err ErrNodeNameRequired) Error() string {
 	return "a node name is required"
 }
 
-// TODO: describe method
+// Execute writes a list of nearby nodes to the given io.Writer and returns an
+// error.
 func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 	var nodeName string
 	var remainingArgs []string
@@ -150,6 +153,8 @@ func Usage(flags *flag.FlagSet, writer io.Writer) {
 	flags.SetOutput(ioutil.Discard)
 }
 
+// DefaultClient returns a Kubernetes client based on the given path to a
+// Kubernetes config file.
 func DefaultClient(kubeconfig string) (*kubernetes.Clientset, error) {
 	var loadingRules *clientcmd.ClientConfigLoadingRules
 	if kubeconfig == "" {

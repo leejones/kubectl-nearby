@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -165,7 +166,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 		namespaceForList = podsCLI.namespace
 	}
 
-	podDetails, err := podsCLI.clientset.CoreV1().Pods(podsCLI.namespace).Get(podsCLI.podName, metav1.GetOptions{})
+	podDetails, err := podsCLI.clientset.CoreV1().Pods(podsCLI.namespace).Get(context.TODO(), podsCLI.podName, metav1.GetOptions{})
 	if err != nil {
 		fmt.Println("ERROR: ", err)
 		os.Exit(1)
@@ -177,7 +178,7 @@ func (podsCLI podsCLI) fetchPods() ([]podInfo, error) {
 	listOptions := metav1.ListOptions{
 		FieldSelector: fmt.Sprintf("spec.nodeName=%v", podDetails.Spec.NodeName),
 	}
-	podsForNode, err := podsCLI.clientset.CoreV1().Pods(namespaceForList).List(listOptions)
+	podsForNode, err := podsCLI.clientset.CoreV1().Pods(namespaceForList).List(context.TODO(), listOptions)
 	if err != nil {
 		fmt.Println("ERROR: ", err)
 		os.Exit(1)

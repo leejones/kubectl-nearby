@@ -2,6 +2,7 @@
 package nodes
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -81,7 +82,7 @@ func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 		}
 	}
 
-	node, err := n.Client.CoreV1().Nodes().Get(nodeName, metav1.GetOptions{})
+	node, err := n.Client.CoreV1().Nodes().Get(context.TODO(), nodeName, metav1.GetOptions{})
 	if err != nil {
 		return fmt.Errorf("unable fetch node: %v", err)
 	}
@@ -91,7 +92,7 @@ func (n *NodesCLI) Execute(args []string, writer io.Writer) error {
 		return fmt.Errorf("unable to find label 'topology.kubernetes.io/zone' on node: %v", node.Name)
 	}
 
-	nearbyNodes, err := n.Client.CoreV1().Nodes().List(metav1.ListOptions{
+	nearbyNodes, err := n.Client.CoreV1().Nodes().List(context.TODO(), metav1.ListOptions{
 		LabelSelector: fmt.Sprintf("topology.kubernetes.io/zone=%v", zone),
 	})
 	if err != nil {

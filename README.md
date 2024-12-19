@@ -54,5 +54,5 @@ This is the standard release process for maintainers.
 1. Find the tag named after the version you just created
 1. Click **...** and click **Create release**
     1. Release title format: `Release vX.Y.Z`
-    2. Description: Note relevant changes and link to the PR(s).
+    2. Description: Use the "Generate Release Notes" button.
     3. Attach the `.tar.gz` files from your local `releases/vX.Y.Z` directory.

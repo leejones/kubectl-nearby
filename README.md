@@ -46,13 +46,30 @@ Options:
 
 This is the standard release process for maintainers.
 
-1. Go to the [Releases](https://github.com/leejones/kubectl-nearby/releases) page
-1. Note the most recent release version
-1. Locally, checkout the `main` branch to the latest revision
-1. Run `bin/release VERSION` where version is in the form `vX.Y.Z` and is the next logical semantic version based on the changes
-1. Go to the [Tags](https://github.com/leejones/kubectl-nearby/tags) page
-1. Find the tag named after the version you just created
-1. Click **...** and click **Create release**
-    1. Release title format: `Release vX.Y.Z`
-    2. Description: Use the "Generate Release Notes" button.
-    3. Attach the `.tar.gz` files from your local `releases/vX.Y.Z` directory.
+1. Install `gh` (the [GitHub CLI](https://cli.github.com)) if you don't have it already.
+1. Note the most recent release version:
+
+    ```bash
+    gh release list --limit 1
+    ```
+
+1. Locally, checkout the `main` branch to the latest revision.
+1. Set the version variable for the new release (in the form `vX.Y.Z`):
+
+    ```bash
+    read -p "Enter the new version (e.g., v1.2.3): " VERSION
+    ```
+
+1. Run the release script:
+
+    ```bash
+    bin/release $VERSION
+    ```
+
+1. Create the release using the GitHub CLI:
+
+    ```bash
+    gh release create $VERSION releases/${VERSION}/targets/*/*.tar.gz \
+      --title "Release $VERSION" \
+      --generate-notes
+    ```

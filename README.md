@@ -54,11 +54,22 @@ This is the standard release process for maintainers.
     ```
 
 1. Locally, checkout the `main` branch to the latest revision.
-1. Run `bin/release VERSION` where version is in the form `vX.Y.Z` and is the next logical semantic version based on the changes.
+1. Set the version variable for the new release (in the form `vX.Y.Z`):
+
+    ```bash
+    read -p "Enter the new version (e.g., v1.2.3): " VERSION
+    ```
+
+1. Run the release script:
+
+    ```bash
+    bin/release $VERSION
+    ```
+
 1. Create the release using the GitHub CLI:
 
-   ```bash
-   gh release create vX.Y.Z releases/vX.Y.Z/targets/*/*.tar.gz \
-     --title "Release vX.Y.Z" \
-     --generate-notes
-   ```
+    ```bash
+    gh release create $VERSION releases/${VERSION}/targets/*/*.tar.gz \
+      --title "Release $VERSION" \
+      --generate-notes
+    ```

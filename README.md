@@ -69,7 +69,7 @@ This is the standard release process for maintainers.
 1. Create the release using the GitHub CLI:
 
     ```bash
-    gh release create $VERSION releases/${VERSION}/targets/*/*.tar.gz \
+    gh release create $VERSION $(find "releases/${VERSION}/targets" -name "*.tar.gz") \
       --title "Release $VERSION" \
       --generate-notes
     ```

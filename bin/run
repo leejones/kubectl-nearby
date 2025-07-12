@@ -11,5 +11,5 @@ source "bin/lib/build-utils.sh"
 
 go run \
   "$(_ldflags)" \
-  $(_go_files) \
+  . \
   "${@}"

@@ -46,6 +46,7 @@ Options:
 
 This is the standard release process for maintainers.
 
+1. Install the [GitHub CLI](https://cli.github.com) if you don't have it already.
 1. Note the most recent release version: `gh release list --limit 1`
 1. Locally, checkout the `main` branch to the latest revision
 1. Run `bin/release VERSION` where version is in the form `vX.Y.Z` and is the next logical semantic version based on the changes

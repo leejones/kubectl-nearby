@@ -55,7 +55,7 @@ for target in darwin/amd64 darwin/arm64 linux/amd64 linux/arm64; do
   release_directory="${base_directory}/targets/${os}/${platform}"
   mkdir -p "${release_directory}"
   binary_file_path="${release_directory}/${binary_name}"
-  GOOS="${os}" GOARCH="${platform}" go build -o "${binary_file_path}" "$(_ldflags "${version}")" $(_go_files)
+  GOOS="${os}" GOARCH="${platform}" go build -o "${binary_file_path}" "$(_ldflags "${version}")" .
   echo "== Created ${binary_file_path}"
   compressed_filename="${binary_name}-${version}-${os}-${platform}.tar.gz"
   # COPYFILE_DISABLE prevents a MacOS metadata file from being included in the tar

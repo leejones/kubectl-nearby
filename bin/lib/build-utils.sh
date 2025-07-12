@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-function _go_files() {
-  find . -type f -name '*.go' -depth 1 -not -name '*_test.go' \
-    | tr '\r\n' ' '
-}
-
 function _ldflags() {
   local version="${1:-development}"
   local package_name="main"

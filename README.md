@@ -46,7 +46,7 @@ Options:
 
 This is the standard release process for maintainers.
 
-1. Install the [GitHub CLI](https://cli.github.com) if you don't have it already.
+1. Install `gh` (the [GitHub CLI](https://cli.github.com)) if you don't have it already.
 1. Note the most recent release version:
 
     ```bash

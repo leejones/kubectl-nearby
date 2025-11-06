@@ -141,7 +141,7 @@ func setupTestKubeconfig(t *testing.T) {
 	t.Helper()
 	workingDirectory, err := os.Getwd()
 	if err != nil {
-		t.Errorf("working directory: %v", err)
+		t.Fatalf("working directory: %v", err)
 	}
 	// The user's default kubeconfig (e.g. $HOME/.kube/config) may have a namespace set. This
 	// makes the namespace test less reliable. Setting the KUBECONFIG ENV var is a close approximation

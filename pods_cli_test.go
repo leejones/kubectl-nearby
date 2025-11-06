@@ -16,18 +16,10 @@ func TestNewPodsCLINoArgs(t *testing.T) {
 }
 
 func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
+	setupTestKubeconfig(t)
 	args := []string{
 		"nginx-abc123",
 	}
-	workingDirectory, err := os.Getwd()
-	if err != nil {
-		t.Errorf("working directory: %v", err)
-	}
-	// The user's default kubeconfig (e.g. $HOME/.kube/config) may have a namespace set. This
-	// makes the namespace test less reliable. Setting the KUBECONFIG ENV var is a close approximation
-	// to the user's default kubeconfig and allows us to have predictable results.
-	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
-	defer os.Unsetenv("KUBECONFIG")
 	podsCLI, err := newPodsCLI(args)
 	if err != nil {
 		t.Errorf("Error creating new podsCLI: %v", err)
@@ -80,12 +72,7 @@ func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
 }
 
 func TestNewPodsCLIPodAllNamespaces(t *testing.T) {
-	workingDirectory, err := os.Getwd()
-	if err != nil {
-		t.Errorf("working directory: %v", err)
-	}
-	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
-	defer os.Unsetenv("KUBECONFIG")
+	setupTestKubeconfig(t)
 	args := []string{
 		"nginx-abc123",
 		"--all-namespaces",
@@ -103,12 +90,7 @@ func TestNewPodsCLIPodAllNamespaces(t *testing.T) {
 }
 
 func TestNewPodsCLIPodCustomNamespace(t *testing.T) {
-	workingDirectory, err := os.Getwd()
-	if err != nil {
-		t.Errorf("working directory: %v", err)
-	}
-	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
-	defer os.Unsetenv("KUBECONFIG")
+	setupTestKubeconfig(t)
 	args := []string{
 		"nginx-abc123",
 		"--namespace",
@@ -154,3 +136,15 @@ func TestNewPodsCLIInvalidFlag(t *testing.T) {
 }
 
 // TODO test podsCLI.clientset?
+
+func setupTestKubeconfig(t *testing.T) {
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		t.Errorf("working directory: %v", err)
+	}
+	// The user's default kubeconfig (e.g. $HOME/.kube/config) may have a namespace set. This
+	// makes the namespace test less reliable. Setting the KUBECONFIG ENV var is a close approximation
+	// to the user's default kubeconfig and allows us to have predictable results.
+	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
+	t.Cleanup(func() { os.Unsetenv("KUBECONFIG") })
+}

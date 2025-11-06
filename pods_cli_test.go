@@ -138,6 +138,7 @@ func TestNewPodsCLIInvalidFlag(t *testing.T) {
 // TODO test podsCLI.clientset?
 
 func setupTestKubeconfig(t *testing.T) {
+	t.Helper()
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		t.Errorf("working directory: %v", err)

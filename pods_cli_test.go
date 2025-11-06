@@ -16,18 +16,10 @@ func TestNewPodsCLINoArgs(t *testing.T) {
 }
 
 func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
+	setupTestKubeconfig(t)
 	args := []string{
 		"nginx-abc123",
 	}
-	workingDirectory, err := os.Getwd()
-	if err != nil {
-		t.Errorf("working directory: %v", err)
-	}
-	// The user's default kubeconfig (e.g. $HOME/.kube/config) may have a namespace set. This
-	// makes the namespace test less reliable. Setting the KUBECONFIG ENV var is a close approximation
-	// to the user's default kubeconfig and allows us to have predictable results.
-	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
-	defer os.Unsetenv("KUBECONFIG")
 	podsCLI, err := newPodsCLI(args)
 	if err != nil {
 		t.Errorf("Error creating new podsCLI: %v", err)
@@ -58,6 +50,7 @@ func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
 }
 
 func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
+	setupTestKubeconfig(t)
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		t.Errorf("Could not get working directory: %v", err)
@@ -80,6 +73,7 @@ func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
 }
 
 func TestNewPodsCLIPodAllNamespaces(t *testing.T) {
+	setupTestKubeconfig(t)
 	args := []string{
 		"nginx-abc123",
 		"--all-namespaces",
@@ -97,6 +91,7 @@ func TestNewPodsCLIPodAllNamespaces(t *testing.T) {
 }
 
 func TestNewPodsCLIPodCustomNamespace(t *testing.T) {
+	setupTestKubeconfig(t)
 	args := []string{
 		"nginx-abc123",
 		"--namespace",
@@ -115,6 +110,7 @@ func TestNewPodsCLIPodCustomNamespace(t *testing.T) {
 }
 
 func TestNewPodsCLIHelp(t *testing.T) {
+	setupTestKubeconfig(t)
 	argSets := [][]string{
 		{"-h"},
 		{"--help"},
@@ -130,6 +126,7 @@ func TestNewPodsCLIHelp(t *testing.T) {
 }
 
 func TestNewPodsCLIInvalidFlag(t *testing.T) {
+	setupTestKubeconfig(t)
 	args := []string{
 		"--not-a-valid-flag",
 	}
@@ -142,3 +139,16 @@ func TestNewPodsCLIInvalidFlag(t *testing.T) {
 }
 
 // TODO test podsCLI.clientset?
+
+// setupTestKubeconfig configures a default kubeconfig path using the KUBECONFIG env variable.  This avoids unexpected test failures when a user has a namespace set in their kubeconfig file or they don't have a kubeconfig file at all (e.g. in CI).  Setting the KUBECONFIG env var is a close approximation to the user's default kubeconfig behavior and allows us to have predictable results.
+func setupTestKubeconfig(t *testing.T) {
+	t.Helper()
+
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		t.Fatalf("working directory: %v", err)
+	}
+
+	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
+	t.Cleanup(func() { os.Unsetenv("KUBECONFIG") })
+}

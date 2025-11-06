@@ -80,6 +80,12 @@ func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
 }
 
 func TestNewPodsCLIPodAllNamespaces(t *testing.T) {
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		t.Errorf("working directory: %v", err)
+	}
+	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
+	defer os.Unsetenv("KUBECONFIG")
 	args := []string{
 		"nginx-abc123",
 		"--all-namespaces",
@@ -97,6 +103,12 @@ func TestNewPodsCLIPodAllNamespaces(t *testing.T) {
 }
 
 func TestNewPodsCLIPodCustomNamespace(t *testing.T) {
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		t.Errorf("working directory: %v", err)
+	}
+	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
+	defer os.Unsetenv("KUBECONFIG")
 	args := []string{
 		"nginx-abc123",
 		"--namespace",

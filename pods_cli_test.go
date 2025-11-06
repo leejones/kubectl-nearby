@@ -50,6 +50,7 @@ func TestNewPodsCLIPodNameWithDefaults(t *testing.T) {
 }
 
 func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
+	setupTestKubeconfig(t)
 	workingDirectory, err := os.Getwd()
 	if err != nil {
 		t.Errorf("Could not get working directory: %v", err)
@@ -109,6 +110,7 @@ func TestNewPodsCLIPodCustomNamespace(t *testing.T) {
 }
 
 func TestNewPodsCLIHelp(t *testing.T) {
+	setupTestKubeconfig(t)
 	argSets := [][]string{
 		{"-h"},
 		{"--help"},
@@ -124,6 +126,7 @@ func TestNewPodsCLIHelp(t *testing.T) {
 }
 
 func TestNewPodsCLIInvalidFlag(t *testing.T) {
+	setupTestKubeconfig(t)
 	args := []string{
 		"--not-a-valid-flag",
 	}

@@ -42,7 +42,15 @@ Options:
 
 * `--kubeconfig` - The location of the kubeconfig file if it's not in a standard location.
 
-## Creating a new release
+## Development
+
+### Running the Tests
+
+```
+go test -v ./...
+```
+
+### Creating a new release
 
 This is the standard release process for maintainers.
 

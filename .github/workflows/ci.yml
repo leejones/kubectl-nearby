@@ -12,46 +12,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Extract Go version from go.mod
-        id: get-go-version
-        run: |
-          # Read the 'go' directive from go.mod (e.g. "go 1.23")
-          if [ ! -f go.mod ]; then
-            echo "go.mod not found in repository" >&2
-            exit 1
-          fi
-
-          ver=$(grep '^go ' go.mod | awk '{print $2}' || true)
-          if [ -z "$ver" ]; then
-            echo "No 'go' directive found in go.mod; failing CI" >&2
-            exit 1
-          fi
-
-          echo "::notice::Found Go version: $ver"
-
-          # Expose the step output for later use.
-          echo "go-version=$ver" >> $GITHUB_OUTPUT
-
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v6
         with:
-          go-version: ${{ steps.get-go-version.outputs.go-version }}
-
-      - name: Ensure module cache directories are clean
-        run: |
-          rm -rf ~/.cache/go-build
-          rm -rf ~/go/pkg/mod
-          mkdir -p ~/go/pkg/mod
-
-      - name: Cache Go modules and build cache
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/go-build
-            ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
+          go-version-file: "go.mod"
+          cache: true
+          cache-dependency-path: "go.sum"
 
       - name: Download dependencies
         run: go mod download

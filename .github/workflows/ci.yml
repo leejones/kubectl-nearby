@@ -20,12 +20,16 @@ jobs:
             echo "go.mod not found in repository" >&2
             exit 1
           fi
+
           ver=$(grep '^go ' go.mod | awk '{print $2}' || true)
           if [ -z "$ver" ]; then
             echo "No 'go' directive found in go.mod; failing CI" >&2
             exit 1
           fi
-          # Expose as a step output for setup-go
+
+          echo "::notice::Found Go version: $ver"
+
+          # Expose the step output for later use.
           echo "go-version=$ver" >> $GITHUB_OUTPUT
 
       - name: Set up Go

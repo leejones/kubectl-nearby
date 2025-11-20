@@ -12,10 +12,29 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Extract Go version from go.mod
+        id: get-go-version
+        run: |
+          # Attempt to read the 'go' directive from go.mod (e.g. "go 1.23")
+          if [ -f go.mod ]; then
+            ver=$(grep '^go ' go.mod | awk '{print $2}' || true)
+          else
+            ver=""
+          fi
+
+          # Fallback to a sensible default if nothing found
+          if [ -z "$ver" ]; then
+            echo "No go version found in go.mod, defaulting to 1.23"
+            ver="1.23"
+          fi
+
+          # Expose as a step output for setup-go
+          echo "go-version=$ver" >> $GITHUB_OUTPUT
+
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: "1.23"
+          go-version: ${{ steps.get-go-version.outputs.go-version }}
 
       - name: Cache Go modules and build cache
         uses: actions/cache@v4

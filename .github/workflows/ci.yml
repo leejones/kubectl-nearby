@@ -37,6 +37,12 @@ jobs:
         with:
           go-version: ${{ steps.get-go-version.outputs.go-version }}
 
+      - name: Ensure module cache directories are clean
+        run: |
+          rm -rf ~/.cache/go-build
+          rm -rf ~/go/pkg/mod
+          mkdir -p ~/go/pkg/mod
+
       - name: Cache Go modules and build cache
         uses: actions/cache@v4
         with:

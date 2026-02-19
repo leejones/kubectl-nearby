@@ -20,14 +20,16 @@ func Age(duration time.Duration) string {
 	}
 }
 
-func Columns(input [][]string) (string, error) {
+func Columns(rows [][]string) (string, error) {
 	columnLengths := []int{}
-	columnCount := len(input[0])
-	for i := 0; i < columnCount; i++ {
+	columnCount := len(rows[0])
+	for range columnCount {
 		columnLengths = append(columnLengths, 0)
 	}
 	output := []string{}
-	for _, row := range input {
+
+	// Find the maximum length of each column.
+	for _, row := range rows {
 		for index, item := range row {
 			currentColumnLength := columnLengths[index]
 			if currentColumnLength < len(item) {
@@ -35,20 +37,22 @@ func Columns(input [][]string) (string, error) {
 			}
 		}
 	}
-	for _, row := range input {
+
+	// Right pad item output with spaces to match the maximum length of the column.
+	for _, row := range rows {
 		outputRow := []string{}
 		for index, item := range row {
 			columnLength := columnLengths[index]
 			outputItem := item
-			// Right pad item output with spaces unless it's the last column.
+			// Right pad all columns except the last one.
 			if index != len(row)-1 {
-				for len(outputItem) < columnLength {
-					outputItem += " "
-				}
+				outputItem = fmt.Sprintf("%-*s", columnLength, item)
 			}
 			outputRow = append(outputRow, outputItem)
 		}
+		// Right pad extra spaces between each column for readability.
 		output = append(output, strings.Join(outputRow, "  "))
 	}
+
 	return strings.Join(output, "\n"), nil
 }

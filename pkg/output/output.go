@@ -23,7 +23,7 @@ func Age(duration time.Duration) string {
 func Columns(input [][]string) (string, error) {
 	columnLengths := []int{}
 	columnCount := len(input[0])
-	for i := 0; i < columnCount; i++ {
+	for range columnCount {
 		columnLengths = append(columnLengths, 0)
 	}
 	output := []string{}

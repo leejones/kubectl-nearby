@@ -40,8 +40,11 @@ func Columns(input [][]string) (string, error) {
 		for index, item := range row {
 			columnLength := columnLengths[index]
 			outputItem := item
-			for len(outputItem) < columnLength {
-				outputItem += " "
+			// Right pad item output with spaces unless it's the last column.
+			if index != len(row)-1 {
+				for len(outputItem) < columnLength {
+					outputItem += " "
+				}
 			}
 			outputRow = append(outputRow, outputItem)
 		}

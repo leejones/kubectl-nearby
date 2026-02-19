@@ -27,6 +27,8 @@ func Columns(input [][]string) (string, error) {
 		columnLengths = append(columnLengths, 0)
 	}
 	output := []string{}
+
+	// Find the maximum length of each column.
 	for _, row := range input {
 		for index, item := range row {
 			currentColumnLength := columnLengths[index]
@@ -35,12 +37,14 @@ func Columns(input [][]string) (string, error) {
 			}
 		}
 	}
+
+	// Right pad item output with spaces to match the maximum length of the column.
 	for _, row := range input {
 		outputRow := []string{}
 		for index, item := range row {
 			columnLength := columnLengths[index]
 			outputItem := item
-			// Right pad item output with spaces unless it's the last column.
+			// Right pad all columns except the last one.
 			if index != len(row)-1 {
 				for len(outputItem) < columnLength {
 					outputItem += " "
@@ -48,7 +52,9 @@ func Columns(input [][]string) (string, error) {
 			}
 			outputRow = append(outputRow, outputItem)
 		}
+		// Right pad extra spaces between each column for readability.
 		output = append(output, strings.Join(outputRow, "  "))
 	}
+
 	return strings.Join(output, "\n"), nil
 }

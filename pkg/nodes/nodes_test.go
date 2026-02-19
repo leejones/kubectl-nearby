@@ -158,7 +158,7 @@ func TestDefaultClient(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error getting working directory: %v", err)
 		}
-		_, err = nodes.DefaultClient(path.Join(workingDirectory, "../..", "test/test-kube-config"))
+		_, err = nodes.DefaultClient(path.Join(workingDirectory, "../..", "testdata/test-kube-config"))
 		if err != nil {
 			t.Errorf("unexpected error getting default client: %v", err)
 		}

@@ -58,14 +58,14 @@ func TestNewPodsCLIPodCustomKubeconfig(t *testing.T) {
 	args := []string{
 		"nginx-abc123",
 		"--kubeconfig",
-		path.Join(workingDirectory, "test/test-kube-config"),
+		path.Join(workingDirectory, "testdata/test-kube-config"),
 	}
 	podsCLI, err := newPodsCLI(args)
 	if err != nil {
 		t.Errorf("Error creating new podsCLI: %v", err)
 	}
 
-	want := path.Join(workingDirectory, "test/test-kube-config")
+	want := path.Join(workingDirectory, "testdata/test-kube-config")
 	got := podsCLI.kubeconfig
 	if want != got {
 		t.Errorf("podsCLI.kubeconfig should return %v, got: %v", want, got)
@@ -149,6 +149,6 @@ func setupTestKubeconfig(t *testing.T) {
 		t.Fatalf("working directory: %v", err)
 	}
 
-	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "test/test-default-kube-config"))
+	os.Setenv("KUBECONFIG", path.Join(workingDirectory, "testdata/test-default-kube-config"))
 	t.Cleanup(func() { os.Unsetenv("KUBECONFIG") })
 }

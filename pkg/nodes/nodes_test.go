@@ -141,7 +141,7 @@ func TestExecute(t *testing.T) {
 			t.Errorf("Unexpected error reading output: %v\n", err)
 		}
 
-		expected := `NAME      STATUS  ROLES   AGE  VERSION  ZONE      
+		expected := `NAME      STATUS  ROLES   AGE  VERSION  ZONE
 node-a-1  Ready   <none>  60m  1.19.10  us-east4-a
 node-a-2  Ready   <none>  60m  1.19.10  us-east4-a
 `

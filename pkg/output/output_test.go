@@ -43,8 +43,8 @@ func TestAge(t *testing.T) {
 func TestColumns(t *testing.T) {
 	want := strings.Trim(`
 NAMESPACE   NAME               READY
-default     foo-bar-abc123     1/3  
-production  baz-bat-db-def456  2/2  
+default     foo-bar-abc123     1/3
+production  baz-bat-db-def456  2/2
 `, "\n")
 	input := [][]string{
 		{"NAMESPACE", "NAME", "READY"},

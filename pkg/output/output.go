@@ -46,9 +46,7 @@ func Columns(rows [][]string) (string, error) {
 			outputItem := item
 			// Right pad all columns except the last one.
 			if index != len(row)-1 {
-				for len(outputItem) < columnLength {
-					outputItem += " "
-				}
+				outputItem = fmt.Sprintf("%-*s", columnLength, item)
 			}
 			outputRow = append(outputRow, outputItem)
 		}

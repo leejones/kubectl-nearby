@@ -20,16 +20,16 @@ func Age(duration time.Duration) string {
 	}
 }
 
-func Columns(input [][]string) (string, error) {
+func Columns(rows [][]string) (string, error) {
 	columnLengths := []int{}
-	columnCount := len(input[0])
+	columnCount := len(rows[0])
 	for range columnCount {
 		columnLengths = append(columnLengths, 0)
 	}
 	output := []string{}
 
 	// Find the maximum length of each column.
-	for _, row := range input {
+	for _, row := range rows {
 		for index, item := range row {
 			currentColumnLength := columnLengths[index]
 			if currentColumnLength < len(item) {
@@ -39,7 +39,7 @@ func Columns(input [][]string) (string, error) {
 	}
 
 	// Right pad item output with spaces to match the maximum length of the column.
-	for _, row := range input {
+	for _, row := range rows {
 		outputRow := []string{}
 		for index, item := range row {
 			columnLength := columnLengths[index]
